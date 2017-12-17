@@ -1,0 +1,59 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.hari.kotlintutorial"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        buildTypes.each {
+            it.buildConfigField 'String', 'MOVIE_DB_API_KEY', '"925b1ceccf509d0a6e0669a5041a8497"'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:'+ rootProject.ext.supportLibVersion
+    implementation 'com.android.support.constraint:constraint-layout:'+ rootProject.ext.constraintLayoutVersion
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.android.support:palette-v7:'+ rootProject.ext.supportLibVersion
+    implementation 'com.android.support:recyclerview-v7:'+ rootProject.ext.supportLibVersion
+    implementation 'com.android.support:design:'+ rootProject.ext.supportLibVersion
+
+    // Rx
+    implementation 'io.reactivex.rxjava2:rxjava:'+ rootProject.ext.rxJavaVersion
+    implementation 'io.reactivex.rxjava2:rxandroid:'+ rootProject.ext.rxAndroidVersion
+
+    // Gson
+    implementation 'com.google.code.gson:gson:'+ rootProject.ext.gsonVersion
+
+    // Retrofit 2
+    implementation 'com.squareup.retrofit2:retrofit:'+ rootProject.ext.retrofitVersion
+    implementation 'com.squareup.retrofit2:converter-gson:'+ rootProject.ext.retrofitVersion
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:'+ rootProject.ext.retrofitVersion
+
+    // okHttp 3
+    implementation "com.squareup.okhttp3:okhttp:"+ rootProject.ext.okHttpVersion
+    implementation "com.squareup.okhttp3:logging-interceptor:"+ rootProject.ext.okHttpVersion
+
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:'+ rootProject.ext.glideVersion
+}

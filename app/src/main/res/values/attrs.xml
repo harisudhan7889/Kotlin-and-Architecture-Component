@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="assignment_progress_bar">
+        <attr name="progressDrawable" format="reference" />
+        <attr name="progressTextSize" format="integer" />
+        <attr name="progressTextColor" format="color" />
+    </declare-styleable>
+</resources>
