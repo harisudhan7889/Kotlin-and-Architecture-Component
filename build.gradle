@@ -43,4 +43,7 @@ ext {
 
     // Glide
     glideVersion = '4.2.0'
+
+    // Architecture components
+    archVersion = '1.0.0'
 }

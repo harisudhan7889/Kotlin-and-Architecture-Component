@@ -11,7 +11,7 @@ interface ListMovies {
      Callback listener to view.
      */
     interface View {
-        fun showMovies(movies: List<Movie>?)
+        fun insertInDatabase(movies: List<Movie>?)
         fun onItemClick(movie: Movie)
     }
 

@@ -1,23 +1,33 @@
-package com.hari.kotlintutorial.listing
+package com.hari.kotlintutorial.db
 
+import android.arch.lifecycle.LiveData
 import com.hari.kotlintutorial.api.MovieApi
+import com.hari.kotlintutorial.models.Movie
 import com.hari.kotlintutorial.models.Movies
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Executors
 
 /**
  * @author Hari Hara Sudhan.N
  */
 
-class ListMoviesPresenterImpl(private val context: MoviesListFragment) : ListMovies.Preseneter {
+class MovieRepository(private val movieApi: MovieApi, private val movieDao: MovieDao) {
 
-    /**
-     * Service call to get movies from TMDB - The Movie Data Base.
-     */
-    override fun getMovies() {
+    fun getMoviesFromRemoteAndSave() {
+        movieDao.getCount()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it == 0) {
+                        getMoviesFromRemote()
+                    }
+                }, { e -> onFailure(e) })
+    }
+
+    private fun getMoviesFromRemote() {
         // Lambda expression which reduces the no of lines,
         // so code understanding will be easy.
-        val movieApi = MovieApi.create()
         movieApi.getMovies(createQueryMap())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -36,7 +46,10 @@ class ListMoviesPresenterImpl(private val context: MoviesListFragment) : ListMov
         // Filtering the list with a condition.
         listOfMovies.filter { "" != it.id }
 
-        //(context as ListMovies.View).insertInDatabase(listOfMovies)
+        // Cannot update the DB in main thread, so created a background thread
+        val executor = Executors.newFixedThreadPool(1)
+        val worker = Runnable { movieDao.insertMovies(movies.movies) }
+        executor.execute(worker)
     }
 
     /**
@@ -44,6 +57,10 @@ class ListMoviesPresenterImpl(private val context: MoviesListFragment) : ListMov
      */
     private fun onFailure(e: Throwable?) {
         print(e?.message)
+    }
+
+    fun getMovies(): LiveData<List<Movie>> {
+        return movieDao.getMovies()
     }
 
     /**

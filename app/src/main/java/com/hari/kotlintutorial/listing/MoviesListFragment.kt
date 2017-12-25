@@ -1,15 +1,24 @@
 package com.hari.kotlintutorial.listing
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hari.kotlintutorial.R
+import com.hari.kotlintutorial.api.MovieApi
+import com.hari.kotlintutorial.db.MovieDatabase
+import com.hari.kotlintutorial.db.MovieRepository
 import com.hari.kotlintutorial.models.Movie
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_movie_list.*
 
 /**
@@ -19,12 +28,20 @@ import kotlinx.android.synthetic.main.fragment_movie_list.*
  */
 class MoviesListFragment : Fragment(), ListMovies.View {
 
-    lateinit private var listMoviesPresenter: ListMovies.Preseneter
-    lateinit private var callback: MovieListCallback
+    private lateinit var listMoviesPresenter: ListMovies.Preseneter
+    private lateinit var callback: MovieListCallback
+    private lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var movieListViewModel: MovieListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        listMoviesPresenter = ListMoviesPresenterImpl(this)
+        val movieDatabase = MovieDatabase.getInstance(context)
+
+        // Repositary for handling Remote services and explicit database handling
+        val movieRepository = MovieRepository(MovieApi.create(), movieDatabase.MovieDao())
+        viewModelFactory = ViewModelFactory(movieRepository)
+        movieListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel::class.java)
+        //listMoviesPresenter = ListMoviesPresenterImpl(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,7 +62,23 @@ class MoviesListFragment : Fragment(), ListMovies.View {
         }
     }
 
-    override fun showMovies(movies: List<Movie>?) {
+    /*
+     This method is not used. This is to show how we would handled if we did not
+     use repository module in ViewModel and if we used presenter.
+     */
+    override fun insertInDatabase(movies: List<Movie>?) {
+        movies?.let {
+            //movieListViewModel.updateMovies(movies)
+        }
+    }
+
+    private fun showMovies(movies: Flowable<List<Movie>>) {
+        movies.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ showMovies(it) }, { e -> Log.e("MoviesListFragment", e.toString()) })
+    }
+
+    private fun showMovies(movies: List<Movie>?) {
         // Type Casting
         (movies_listing.adapter as MovieListAdapter).setMovies(movies)
     }
@@ -71,6 +104,7 @@ class MoviesListFragment : Fragment(), ListMovies.View {
         // created, values get assigned to this variable.
         movies_listing.setHasFixedSize(true)
         movies_listing.adapter = MovieListAdapter(this)
-        listMoviesPresenter.getMovies()
+        movieListViewModel.getMoviesFromDatabase().observe(this, Observer { movies -> showMovies(movies) })
+        movieListViewModel.getMoviesFromRemoteAndSave()
     }
 }

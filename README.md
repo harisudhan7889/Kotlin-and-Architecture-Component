@@ -98,3 +98,9 @@ you can directly use comma separation if you want to extend or implement.
 * Elvis operator
 * Filter operator in list
 * Lambda expression
+
+### Architecture Component in kotlin
+
+* Room Database
+* LiveData
+* ViewModel

@@ -1,8 +1,11 @@
 package com.hari.kotlintutorial.listing
 
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.hari.kotlintutorial.R
+import com.hari.kotlintutorial.db.MovieDatabase
 import com.hari.kotlintutorial.details.MovieDetailsActivity
 import com.hari.kotlintutorial.models.Movie
 
@@ -13,9 +16,10 @@ import com.hari.kotlintutorial.models.Movie
  */
 class MovieListActivity : AppCompatActivity(), MovieListCallback {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_list)
+
         loadMovies(savedInstanceState)
     }
 

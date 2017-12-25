@@ -1,5 +1,8 @@
 package com.hari.kotlintutorial.models
 
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
@@ -9,13 +12,20 @@ import com.google.gson.annotations.SerializedName
  *
  * @author Hari Hara Sudhan.N
  */
-data class Movie(val id: String,
-                 val overview: String,
+@Entity(tableName = "movie")
+data class Movie(@PrimaryKey
+                 @ColumnInfo(name = "id") val id: String,
+                 @ColumnInfo(name = "description") val overview: String,
+                 @ColumnInfo(name = "poster")
                  @SerializedName("poster_path") val posterPath: String,
-                 val title: String,
+                 @ColumnInfo(name = "title") val title: String,
+                 @ColumnInfo(name = "vote_average")
                  @SerializedName("vote_average") val voteAverage: String,
-                 @SerializedName("vote_count") private val voteCount: String,
+                 @ColumnInfo(name = "vote_count")
+                 @SerializedName("vote_count") val voteCount: String,
+                 @ColumnInfo(name = "backdrop")
                  @SerializedName("backdrop_path") val backdropPath: String,
+                 @ColumnInfo(name = "release_date")
                  @SerializedName("release_date") val releaseDate: String) : Parcelable {
 
     constructor(parcel: Parcel) : this(
